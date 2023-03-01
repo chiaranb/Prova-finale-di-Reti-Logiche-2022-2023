@@ -93,7 +93,10 @@ end component;
           signal rZ3_sel : STD_LOGIC;
           
     --Demultiplexer
-          signal demux : STD_LOGIC_VECTOR (7 downto 0);
+          signal demux_Z0 : STD_LOGIC_VECTOR (7 downto 0);
+          signal demux_Z1 : STD_LOGIC_VECTOR (7 downto 0);
+          signal demux_Z2 : STD_LOGIC_VECTOR (7 downto 0);
+          signal demux_Z3 : STD_LOGIC_VECTOR (7 downto 0);
           signal demux_sel : STD_LOGIC_VECTOR (1 downto 0);
 
 type Stato is ( );
@@ -174,3 +177,47 @@ begin
     end process;
           
 end Behavioral;
+
+-- fin qui lo abbiamo fatto insieme
+          
+          
+    --Mux2
+          with r2_sel select
+        mux_regAdd <= "00000000" when '0',
+                    i_w when '1',
+                    "XXXXXXXX" when others;
+          
+     --Mux3
+          with r3_sel select
+        mux_regZ0 <= "00000000" when '0',
+                    o_regZ0 when '1',
+                    "XXXXXXXX" when others;
+          
+      --Mux4
+          with r4_sel select
+        mux_regZ1 <= "00000000" when '0',
+                    o_regZ1 when '1',
+                    "XXXXXXXX" when others;
+          
+          
+       --Mux5
+          with r5_sel select
+        mux_regZ2 <= "00000000" when '0',
+                    o_regZ2 when '1',
+                    "XXXXXXXX" when others;
+          
+        --Mux6
+          with r6_sel select
+        mux_regZ3 <= "00000000" when '0',
+                    o_regZ3 when '1',
+                    "XXXXXXXX" when others;
+          
+         --Demux
+            architecture rtl of demux_1_4_Nbit is
+            begin
+                demux_Z0 <= x when demux_sel=”00” --else (others => ’-’);
+                demux_Z1 <= x when demux_sel=”01” --else (others => ’-’);
+                demux_Z2 <= x when demux_sel=”10” --else (others => ’-’);
+                demux_Z3 <= x when demux_sel=”11” --else (others => ’-’);
+            end rtl;
+          
