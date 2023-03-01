@@ -3,7 +3,6 @@
 -- Chiara Thien Thao Nguyen Ba CodicePersona 10727985
 -- Flavia Nicotri CodicePersona 10751801
 -- Prof. Fabio Salice
---
 -- Module Name: project_reti_logiche - Behavioral
 -- Project Name: CodicePersona.vhd
 ----------------------------------------------------------------------------------
@@ -15,24 +14,25 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity project_reti_logiche is
-    port (  i_clk : in STD_LOGIC;
-            i_rst : in STD_LOGIC;
-            i_start : in STD_LOGIC;
-            i_w : in STD_LOGIC;
-            o_z0 : out STD_LOGIC_VECTOR (7 downto 0);
-            o_z1 : out STD_LOGIC_VECTOR (7 downto 0);
-            o_z2 : out STD_LOGIC_VECTOR (7 downto 0);
-            o_z3 : out STD_LOGIC_VECTOR (7 downto 0);
-            o_done : out STD_LOGIC;
-            o_mem_addr : out STD_LOGIC_VECTOR (15 downto 0);
-            i_mem_data : in STD_LOGIC_VECTOR (7 downto 0);
-            o_mem_we : out STD_LOGIC;
-            o_mem_en : out STD_LOGIC
+         port (
+             i_clk   : in std_logic;
+             i_rst   : in std_logic;
+             i_start : in std_logic;
+             i_w     : in std_logic;
+             o_z0    : out std_logic_vector(7 downto 0);
+             o_z1    : out std_logic_vector(7 downto 0);
+             o_z2    : out std_logic_vector(7 downto 0);
+             o_z3    : out std_logic_vector(7 downto 0);
+             o_done  : out std_logic;
+             o_mem_addr : out std_logic_vector(15 downto 0);
+             i_mem_data : in std_logic_vector(7 downto 0);
+             o_mem_we   : out std_logic;
+             o_mem_en   : out std_logic
          );
 end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
-    --Datapath component
+--Datapath component
     component datapath is
     Port ( i_clk : in STD_LOGIC;
            i_rst : in STD_LOGIC;
@@ -42,12 +42,12 @@ architecture Behavioral of project_reti_logiche is
            o_z2 : out STD_LOGIC_VECTOR (7 downto 0);
            o_z3 : out STD_LOGIC_VECTOR (7 downto 0);
            rCh_load : in STD_LOGIC;
-           rAdd_load : in STD_LOGIC;
+           rAddr_load : in STD_LOGIC;
            rZ0_load : in STD_LOGIC;
            rZ1_load : in STD_LOGIC;
            rZ2_load : in STD_LOGIC;
            rZ3_load : in STD_LOGIC;
-           rAdd_sel : in STD_LOGIC;
+           rAddr_sel : in STD_LOGIC;
            rZ0_sel : in STD_LOGIC;
            rZ1_sel : in STD_LOGIC;
            rZ2_sel : in STD_LOGIC;
@@ -57,167 +57,184 @@ architecture Behavioral of project_reti_logiche is
           
 end component;  
           
-  --Registri
-          signal o_regCh : STD_LOGIC_VECTOR (1 downto 0);
-          signal rCh_load : STD_LOGIC;
-          
-          signal o_regAdd : STD_LOGIC_VECTOR (15 downto 0);
-          signal rAdd_load : STD_LOGIC;
-          
-          signal o_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ0_load : STD_LOGIC;
-          
-          signal o_regZ1: STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ1_load : STD_LOGIC;
-          
-          signal o_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ2_load : STD_LOGIC;
-          
-          signal o_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ3_load : STD_LOGIC;
-          
-   --Mux
-          signal mux_regAdd : STD_LOGIC_VECTOR (15 downto 0);
-          signal rAdd_sel : STD_LOGIC;
-                    
-          signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ0_sel : STD_LOGIC;
-          
-          signal mux_regZ1 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ1_sel : STD_LOGIC;
-          
-          signal mux_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ2_sel : STD_LOGIC;
-          
-          signal mux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ3_sel : STD_LOGIC;
-          
-    --Demultiplexer
-          signal demux_Z0 : STD_LOGIC_VECTOR (7 downto 0);
-          signal demux_Z1 : STD_LOGIC_VECTOR (7 downto 0);
-          signal demux_Z2 : STD_LOGIC_VECTOR (7 downto 0);
-          signal demux_Z3 : STD_LOGIC_VECTOR (7 downto 0);
-          signal demux_sel : STD_LOGIC_VECTOR (1 downto 0);
+--Registri
+      signal o_regCh : STD_LOGIC_VECTOR (1 downto 0);
+      signal rCh_load : STD_LOGIC;
 
-type Stato is ( );
+      signal o_regAddr : STD_LOGIC_VECTOR (15 downto 0);
+      signal rAddr_load : STD_LOGIC;
+
+      signal o_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ0_load : STD_LOGIC;
+
+      signal o_regZ1: STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ1_load : STD_LOGIC;
+
+      signal o_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ2_load : STD_LOGIC;
+
+      signal o_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ3_load : STD_LOGIC;
+          
+--Mux
+      signal mux_regAddr : STD_LOGIC_VECTOR (15 downto 0);
+      signal rAddr_sel : STD_LOGIC;
+
+      signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ0_sel : STD_LOGIC;
+
+      signal mux_regZ1 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ1_sel : STD_LOGIC;
+
+      signal mux_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ2_sel : STD_LOGIC;
+
+      signal mux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ3_sel : STD_LOGIC;
+          
+--Demultiplexer
+      signal demux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
+      signal demux_regZ1 : STD_LOGIC_VECTOR (7 downto 0);
+      signal demux_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
+      signal demux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
+      signal demux_sel : STD_LOGIC_VECTOR (1 downto 0);
+
+type Stato is (START, );
 signal cur_state, next_state : Stato;
           
 begin
 --
---Datapath 
+----DATAPATH 
 --
-   --Registro Address
-         process(i_clk, i_rst)
-          begin
-            if(i_rst = '1') then
-                o_regAddr <= "0000000000000000";
-          elsif i_clk'event and i_clk = '1' then
-                o_mem_addr(15 downto 1) <= o_mem_addr(14 downto 0);
-                o_mem_addr(0) <= i_w;
-          endif;
-         end process;
+		  
+--Registro Address
+	process(i_clk, i_rst)
+		begin
+			if(i_rst = '1') then
+				o_regAddr <= "0000000000000000";
+			elsif i_clk'event and i_clk = '1' then
+				o_mem_addr(15 downto 1) <= o_mem_addr(14 downto 0);
+				o_mem_addr(0) <= i_w;
+			end if;
+	end process;
                 
-   --Registro Canale
-          process(i_clk, i_rst)
-           begin
-             if(i_rst = '1') then
-                o_regCh <= "00";
-          elsif i_clk'event and i_clk = '1' then
-            o_regCh(2 downto 1) <= o_regCh(1 downto 0);
-            o_regCh(0) <= i_w;
-          endif;
-         end process;
+--Registro Canale
+	process(i_clk, i_rst)
+	   begin
+			if(i_rst = '1') then
+				o_regCh <= "00";
+			elsif i_clk'event and i_clk = '1' then
+				o_regCh(2 downto 1) <= o_regCh(1 downto 0);
+				o_regCh(0) <= i_w;
+			end if;
+	end process;
    
-   --Registro Z0
-          process(i_clk, i_rst)
-           begin
-            if(i_rst = '1') then
-            o_regZ0 <= "00000000";
-        elsif i_clk'event and i_clk = '1' then
-            if(rZ0_load = '1') then
-                o_regZ0 <= i_mem_data;
-            end if;
-        end if;
-    end process;
+--Registro Z0
+	process(i_clk, i_rst)
+	   begin
+			if(i_rst = '1') then
+				o_regZ0 <= "00000000";
+			elsif i_clk'event and i_clk = '1' then
+				if(rZ0_load = '1') then
+					o_regZ0 <= i_mem_data;
+				end if;
+			end if;
+	end process;
           
-  --Registro Z1
-          process(i_clk, i_rst)
-           begin
-            if(i_rst = '1') then
-            o_regZ1 <= "00000000";
-        elsif i_clk'event and i_clk = '1' then
-            if(rZ1_load = '1') then
-                o_regZ1 <= i_mem_data;
-            end if;
-        end if;
-    end process;
+--Registro Z1
+	process(i_clk, i_rst)
+	   begin
+			if(i_rst = '1') then
+				o_regZ1 <= "00000000";
+			elsif i_clk'event and i_clk = '1' then
+				if(rZ1_load = '1') then
+					o_regZ1 <= i_mem_data;
+				end if;
+			end if;
+	end process;
           
-  --Registro Z2
-          process(i_clk, i_rst)
-           begin
-            if(i_rst = '1') then
-            o_regZ2 <= "00000000";
-        elsif i_clk'event and i_clk = '1' then
-            if(rZ2_load = '1') then
-                o_regZ2 <= i_mem_data;
-            end if;
-        end if;
-    end process;
+--Registro Z2
+	process(i_clk, i_rst)
+	   begin
+			if(i_rst = '1') then
+				o_regZ2 <= "00000000";
+			elsif i_clk'event and i_clk = '1' then
+				if(rZ2_load = '1') then
+					o_regZ2 <= i_mem_data;
+				end if;
+			end if;
+	end process;
           
-  --Registro Z3
-          process(i_clk, i_rst)
-           begin
-            if(i_rst = '1') then
-            o_regZ3 <= "00000000";
-        elsif i_clk'event and i_clk = '1' then
-            if(rZ3_load = '1') then
-                o_regZ3 <= i_mem_data;
-            end if;
-        end if;
-    end process;
-          
-end Behavioral;
+--Registro Z3
+	process(i_clk, i_rst)
+	   begin
+			if(i_rst = '1') then
+				o_regZ3 <= "00000000";
+			elsif i_clk'event and i_clk = '1' then
+				if(rZ3_load = '1') then
+					o_regZ3 <= i_mem_data;
+				end if;
+			end if;
+	end process;
 
 -- fin qui lo abbiamo fatto insieme
+                    
+--Mux Address Leggo un bit alla volta
+	with rAddr_sel select
+		mux_regAddr <=  "0" when '0',
+						i_w when '1',
+						"X" when others;
+
+ --Mux Z0
+	with rz0_sel select
+		mux_regZ0 <=  "00000000" when '0',
+					  o_regZ0 when '1',
+					  "XXXXXXXX" when others;
+
+  --Mux Z1
+	with rz1_sel select
+		mux_regZ1 <= "00000000" when '0',
+					 o_regZ1 when '1',
+					 "XXXXXXXX" when others;
+
+--Mux Z2
+	with rz2_sel select
+		mux_regZ2 <= "00000000" when '0',
+					 o_regZ2 when '1',
+					 "XXXXXXXX" when others;
+
+--Mux Z3
+	with rz3_sel select
+		mux_regZ3 <= "00000000" when '0',
+					 o_regZ3 when '1',
+					 "XXXXXXXX" when others;
+
+--Demux
+	with demux_sel select 
+		demux_Z0 <= i_mem_data when ”00”,
+							   '-' when others; --oppure '0' when others da vedere
+		demux_Z1 <= i_mem_data when ”01” ,
+							   '-' when others;
+		demux_Z2 <= i_mem_data when ”10”,
+							   '-' when others;    
+		demux_Z3 <= i_mem_data when ”11”,
+							   '-' when others;
           
+--
+---- FSM
+--
           
-    --Mux2
-          with r2_sel select
-        mux_regAdd <= "00000000" when '0',
-                    i_w when '1',
-                    "XXXXXXXX" when others;
+--Dichirazione stati
+	process(i_clk, i_rst) --default
+	begin
+		if(i_rst = '1') then
+			cur_state <= START;
+		elsif i_clk'event and i_clk = '1' then
+			cur_state <= next_state;
+		end if;
+	end process;
+		 
+	process(cur_state, i_start, i_rst) --completare
+	begin 
           
-     --Mux3
-          with r3_sel select
-        mux_regZ0 <= "00000000" when '0',
-                    o_regZ0 when '1',
-                    "XXXXXXXX" when others;
-          
-      --Mux4
-          with r4_sel select
-        mux_regZ1 <= "00000000" when '0',
-                    o_regZ1 when '1',
-                    "XXXXXXXX" when others;
-          
-          
-       --Mux5
-          with r5_sel select
-        mux_regZ2 <= "00000000" when '0',
-                    o_regZ2 when '1',
-                    "XXXXXXXX" when others;
-          
-        --Mux6
-          with r6_sel select
-        mux_regZ3 <= "00000000" when '0',
-                    o_regZ3 when '1',
-                    "XXXXXXXX" when others;
-          
-         --Demux
-            architecture rtl of demux_1_4_Nbit is
-            begin
-                demux_Z0 <= x when demux_sel=”00” --else (others => ’-’);
-                demux_Z1 <= x when demux_sel=”01” --else (others => ’-’);
-                demux_Z2 <= x when demux_sel=”10” --else (others => ’-’);
-                demux_Z3 <= x when demux_sel=”11” --else (others => ’-’);
-            end rtl;
-          
+end Behavioral;
