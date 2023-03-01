@@ -103,5 +103,74 @@ begin
 --
 --Datapath 
 --
+   --Registro Address
+         process(i_clk, i_rst)
+          begin
+            if(i_rst = '1') then
+                o_regAddr <= "0000000000000000";
+          elsif i_clk'event and i_clk = '1' then
+                o_mem_addr(15 downto 1) <= o_mem_addr(14 downto 0);
+                o_mem_addr(0) <= i_w;
+          endif;
+         end process;
+                
+   --Registro Canale
+          process(i_clk, i_rst)
+           begin
+             if(i_rst = '1') then
+                o_regCh <= "00";
+          elsif i_clk'event and i_clk = '1' then
+            o_regCh(2 downto 1) <= o_regCh(1 downto 0);
+            o_regCh(0) <= i_w;
+          endif;
+         end process;
+   
+   --Registro Z0
+          process(i_clk, i_rst)
+           begin
+            if(i_rst = '1') then
+            o_regZ0 <= "00000000";
+        elsif i_clk'event and i_clk = '1' then
+            if(rZ0_load = '1') then
+                o_regZ0 <= i_mem_data;
+            end if;
+        end if;
+    end process;
+          
+  --Registro Z1
+          process(i_clk, i_rst)
+           begin
+            if(i_rst = '1') then
+            o_regZ1 <= "00000000";
+        elsif i_clk'event and i_clk = '1' then
+            if(rZ1_load = '1') then
+                o_regZ1 <= i_mem_data;
+            end if;
+        end if;
+    end process;
+          
+  --Registro Z2
+          process(i_clk, i_rst)
+           begin
+            if(i_rst = '1') then
+            o_regZ2 <= "00000000";
+        elsif i_clk'event and i_clk = '1' then
+            if(rZ2_load = '1') then
+                o_regZ2 <= i_mem_data;
+            end if;
+        end if;
+    end process;
+          
+  --Registro Z3
+          process(i_clk, i_rst)
+           begin
+            if(i_rst = '1') then
+            o_regZ3 <= "00000000";
+        elsif i_clk'event and i_clk = '1' then
+            if(rZ3_load = '1') then
+                o_regZ3 <= i_mem_data;
+            end if;
+        end if;
+    end process;
           
 end Behavioral;
