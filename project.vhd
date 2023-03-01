@@ -27,8 +27,8 @@ entity project_reti_logiche is
             o_mem_addr : out STD_LOGIC_VECTOR (15 downto 0);
             i_mem_data : in STD_LOGIC_VECTOR (7 downto 0);
             o_mem_we : out STD_LOGIC;
-            o_mem_en : out STD_LOGIC;
-    );
+            o_mem_en : out STD_LOGIC
+         );
 end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
@@ -41,6 +41,18 @@ architecture Behavioral of project_reti_logiche is
            o_z1 : out STD_LOGIC_VECTOR (7 downto 0);
            o_z2 : out STD_LOGIC_VECTOR (7 downto 0);
            o_z3 : out STD_LOGIC_VECTOR (7 downto 0);
+           rCh_load : in STD_LOGIC;
+           rAdd_load : in STD_LOGIC;
+           rZ0_load : in STD_LOGIC;
+           rZ1_load : in STD_LOGIC;
+           rZ2_load : in STD_LOGIC;
+           rZ3_load : in STD_LOGIC;
+           rAdd_sel : in STD_LOGIC;
+           rZ0_sel : in STD_LOGIC;
+           rZ1_sel : in STD_LOGIC;
+           rZ2_sel : in STD_LOGIC;
+           rZ3_sel : in STD_LOGIC;
+           demux_sel : in STD_LOGIC_VECTOR (1 downto 0);
            --o_done: out STD_LOGIC;
           
 end component;  
@@ -63,21 +75,22 @@ end component;
           
           signal o_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
           signal rZ3_load : STD_LOGIC;
+          
    --Mux
           signal mux_regAdd : STD_LOGIC_VECTOR (15 downto 0);
-          signal rAdd_sel :  STD_LOGIC;
+          signal rAdd_sel : STD_LOGIC;
                     
           signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ0_sel :  STD_LOGIC;
+          signal rZ0_sel : STD_LOGIC;
           
           signal mux_regZ1 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ1_sel :  STD_LOGIC;
+          signal rZ1_sel : STD_LOGIC;
           
           signal mux_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ2_sel :  STD_LOGIC;
+          signal rZ2_sel : STD_LOGIC;
           
           signal mux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
-          signal rZ3_sel :  STD_LOGIC;
+          signal rZ3_sel : STD_LOGIC;
           
     --Demultiplexer
           signal demux : STD_LOGIC_VECTOR (7 downto 0);
