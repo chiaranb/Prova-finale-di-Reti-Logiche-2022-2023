@@ -80,7 +80,7 @@ end component;
       signal rZ3_load : STD_LOGIC;
           
 --Mux
-      signal mux_regAddr : STD_LOGIC_VECTOR (15 downto 0);
+      signal mux_regAddr : STD_LOGIC;
       signal rAddr_sel : STD_LOGIC;
 
       signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
@@ -262,6 +262,7 @@ begin
 	when CH_1 =>
 		if i_start = '1' then
 			next_state <= CH_0;
+		end if;
 	when CH_0 => 
 		if i_start = '1' then
 			next_state <= ADDRESS;
