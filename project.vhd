@@ -52,9 +52,8 @@ architecture Behavioral of project_reti_logiche is
            rZ1_sel : in STD_LOGIC;
            rZ2_sel : in STD_LOGIC;
            rZ3_sel : in STD_LOGIC;
-           demux_sel : in STD_LOGIC_VECTOR (1 downto 0);
+           demux_sel : in STD_LOGIC_VECTOR (1 downto 0));
            --o_done: out STD_LOGIC;
-          
 end component;  
           
 --Registri
@@ -211,13 +210,13 @@ begin
 
 --Demux
 	with demux_sel select 
-		demux_Z0 <= i_mem_data when ”00”,
+		demux_regZ0 <= i_mem_data when ”00”,
 				   '-' when others; --oppure '0' when others da vedere
-		demux_Z1 <= i_mem_data when ”01” ,
+		demux_regZ1 <= i_mem_data when ”01” ,
 				   '-' when others;
-		demux_Z2 <= i_mem_data when ”10”,
+		demux_regZ2 <= i_mem_data when ”10”,
 				   '-' when others;    
-		demux_Z3 <= i_mem_data when ”11”,
+		demux_regZ3 <= i_mem_data when ”11”,
 				   '-' when others;
           
 --
