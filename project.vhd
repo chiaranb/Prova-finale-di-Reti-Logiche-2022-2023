@@ -43,6 +43,7 @@ architecture Behavioral of project_reti_logiche is
            o_z3 : out STD_LOGIC_VECTOR (7 downto 0);
            rCh_load : in STD_LOGIC;
            rAddr_load : in STD_LOGIC;
+	   rIN_load : in STD_LOGIC;
            rZ0_load : in STD_LOGIC;
            rZ1_load : in STD_LOGIC;
            rZ2_load : in STD_LOGIC;
@@ -62,6 +63,9 @@ end component;
 
       signal o_regAddr : STD_LOGIC_VECTOR (15 downto 0);
       signal rAddr_load : STD_LOGIC;
+
+      signal o_regIN : STD_LOGIC_VECTOR (7 downto 0);
+      signal rIN_load : STD_LOGIC;
 
       signal o_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ0_load : STD_LOGIC;
@@ -112,8 +116,8 @@ begin
 	 	if(i_rst = '1') then
 			o_regAddr <= "0000000000000000";
 	 	elsif i_clk'event and i_clk = '1' then
-			o_mem_addr(15 downto 1) <= o_mem_addr(14 downto 0);
-			o_mem_addr(0) <= i_w;
+			o_regAddr(15 downto 1) <=o_regAddr(14 downto 0);
+			o_regAddr(0) <= i_w;
 		end if;
 	end process;
                 
@@ -127,6 +131,18 @@ begin
 			o_regCh(0) <= i_w;
 		end if;
 	end process;
+
+--Registro Dato IN
+	process(i_clk, i_rst)
+	    begin
+		if(i_rst = '1') then
+		   	o_regIN <= "00000000";
+		elsif i_clk'event and i_clk = '1' then
+		    if(rIN_load = '1') then
+			o_regIN <= i_mem_data;
+		    end if;
+		end if;
+	    end process;
    
 --Registro Z0
 	process(i_clk, i_rst)
@@ -175,8 +191,6 @@ begin
 			end if;
 		end if;
 	end process;
-
--- fin qui lo abbiamo fatto insieme
                     
 --Mux Address Leggo un bit alla volta
 	with rAddr_sel select
@@ -210,21 +224,21 @@ begin
 
 --Demux
 	with demux_sel select 
-		demux_regZ0 <= i_mem_data when ”00”,
-				   '-' when others; --oppure '0' when others da vedere
-		demux_regZ1 <= i_mem_data when ”01” ,
-				   '-' when others;
-		demux_regZ2 <= i_mem_data when ”10”,
-				   '-' when others;    
-		demux_regZ3 <= i_mem_data when ”11”,
-				   '-' when others;
+		demux_regZ0 <= o_regIN when ”00”,
+				   "XXXXXXXXX" when others; 
+		demux_regZ1 <= o_regIN when ”01” ,
+				   "XXXXXXXXX" when others;
+		demux_regZ2 <= o_regIN when ”10”,
+				   "XXXXXXXXX" when others;    
+		demux_regZ3 <= o_regIN when ”11”,
+				   "XXXXXXXXX" when others;
           
 --
 ---- FSM
 --
           
---Dichirazione stati
-	process(i_clk, i_rst) --default
+--Dichiarazione stati
+	process(i_clk, i_rst) 
 	begin
 		if(i_rst = '1') then
 			cur_state <= RESET;
@@ -235,7 +249,7 @@ begin
 		 
 	process(cur_state, i_start) 
 	begin 
-	  next_state <= cur_state
+	  next_state <= cur_state;
 	  case cur_state is
 	  	when RESET =>
 	  		next_state <= START;
@@ -274,6 +288,7 @@ process	(cur_state)
 begin 
    rCh_load <= '0';
    rAddr_load <= '0';
+   rIN_load <= '0';
    rZ0_load <= '0';
    rZ1_load <= '0';
    rZ2_load <= '0';
@@ -284,7 +299,7 @@ begin
    rZ2_sel <= '0';
    rZ3_sel <= '0';
    o_done <= '0';
-   o_mem_addr <= "0000000000000000";
+   --o_mem_addr <= "0000000000000000";
    o_mem_en <= '0';
    o_mem_we <= '0';
    o_z0 <= mux_regZ0;
@@ -303,7 +318,7 @@ begin
 	when START => 
 	when CH_1 =>
 		rCh_load <= '1';
-	when CH_2 =>
+	when CH_0 =>
 		rCh_load <= '1';
 	when ADDRESS =>
 		rAddr_load <= '1';
