@@ -116,7 +116,7 @@ begin
 	 	if(i_rst = '1') then
 			o_regAddr <= "0000000000000000";
 	 	elsif i_clk'event and i_clk = '1' then
-			o_regAddr(15 downto 1) <=o_regAddr(14 downto 0);
+			o_regAddr(15 downto 1) <= o_regAddr(14 downto 0);
 			o_regAddr(0) <= i_w;
 		end if;
 	end process;
@@ -151,7 +151,7 @@ begin
 			o_regZ0 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
 			if(rZ0_load = '1') then
-				o_regZ0 <= i_mem_data;
+				o_regZ0 <= demux_regZ0;
 			end if;
 		end if;
 	end process;
@@ -163,7 +163,7 @@ begin
 			o_regZ1 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
 			if(rZ1_load = '1') then
-				o_regZ1 <= i_mem_data;
+				o_regZ1 <= demux_regZ1;
 			end if;
 		end if;
 	end process;
@@ -175,7 +175,7 @@ begin
 			o_regZ2 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
 			if(rZ2_load = '1') then
-				o_regZ2 <= i_mem_data;
+				o_regZ2 <= demux_regZ2;
 			end if;
 		end if;
 	end process;
@@ -187,12 +187,12 @@ begin
 			o_regZ3 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
 			if(rZ3_load = '1') then
-				o_regZ3 <= i_mem_data;
+				o_regZ3 <= demux_regZ3;
 			end if;
 		end if;
 	end process;
                     
---Mux Address Leggo un bit alla volta
+--Mux Address
 	with rAddr_sel select
 		mux_regAddr <=  "0" when '0',
 				i_w when '1',
@@ -224,14 +224,14 @@ begin
 
 --Demux
 	with demux_sel select 
-		demux_regZ0 <= o_regIN when ”00”,
-				   "XXXXXXXXX" when others; 
-		demux_regZ1 <= o_regIN when ”01” ,
-				   "XXXXXXXXX" when others;
-		demux_regZ2 <= o_regIN when ”10”,
-				   "XXXXXXXXX" when others;    
-		demux_regZ3 <= o_regIN when ”11”,
-				   "XXXXXXXXX" when others;
+		demux_regZ0 <=  o_regIN when "00",
+			        "XXXXXXXXX" when others; 
+		demux_regZ1 <=  o_regIN when "01" ,
+				"XXXXXXXXX" when others;
+		demux_regZ2 <= 	o_regIN when "10",
+				"XXXXXXXXX" when others;    
+		demux_regZ3 <= 	o_regIN when "11",
+				"XXXXXXXXX" when others;
           
 --
 ---- FSM
@@ -284,7 +284,7 @@ begin
   end process;
 
 --Gestione segnali
-process	(cur_state) 
+process	(cur_state, o_regAddr, o_regCh) 
 begin 
    rCh_load <= '0';
    rAddr_load <= '0';
@@ -315,6 +315,7 @@ begin
 	  	o_regZ1 <= "00000000";
 	  	o_regZ2 <= "00000000";
 	  	o_regZ3 <= "00000000";
+		o_done <= '0';
 	when START => 
 	when CH_1 =>
 		rCh_load <= '1';
@@ -326,6 +327,7 @@ begin
 	when END_ADDRESS =>
 		o_mem_addr <= o_regAddr;
 		o_mem_en <= '1';
+		rIN_load <= '1'; 
 	when REG =>
 		demux_sel <= o_regCh;
 		case demux_sel is
