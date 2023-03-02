@@ -238,50 +238,50 @@ begin
 --
           
 --Dichiarazione stati
-	process(i_clk, i_rst) 
-	begin
-		if(i_rst = '1') then
-			cur_state <= RESET;
-		elsif i_clk'event and i_clk = '1' then
-			cur_state <= next_state;
+process(i_clk, i_rst) 
+begin
+	if(i_rst = '1') then
+		cur_state <= RESET;
+	elsif i_clk'event and i_clk = '1' then
+		cur_state <= next_state;
+	end if;
+end process;
+
+process(cur_state, i_start) 
+begin 
+  next_state <= cur_state;
+  case cur_state is
+	when RESET =>
+		next_state <= START;
+	when START =>
+		if i_start = '1' then
+			next_state <= CH_1;	  			
+		else
+			next_state <= START;
+		end if;	
+	when CH_1 =>
+		if i_start = '1' then
+			next_state <= CH_0;
+	when CH_0 => 
+		if i_start = '1' then
+			next_state <= ADDRESS;
+		else
+			next_state <= END_ADDRESS;
 		end if;
-	end process;
-		 
-	process(cur_state, i_start) 
-	begin 
-	  next_state <= cur_state;
-	  case cur_state is
-	  	when RESET =>
-	  		next_state <= START;
-	  	when START =>
-	  		if i_start = '1' then
-	  			next_state <= CH_1;	  			
-	  		else
-	  			next_state <= START;
-	  		end if;	
-	  	when CH_1 =>
-	  		if i_start = '1' then
-	  			next_state <= CH_0;
-	  	when CH_0 => 
-	  		if i_start = '1' then
-	  			next_state <= ADDRESS;
-	  		else
-	  			next_state <= END_ADDRESS;
-	  		end if;
-	  	when ADDRESS =>
-	  		if i_start = '1' then 
-	  			next_state <= ADDRESS;
-	  		else
-	  			next_state <= END_ADDRESS;
-	  		end if;
-	  	when END_ADDRESS =>
-	  		next_state <= REG;
-	  	when REG =>
-	  		next_state <= DONE;
-	  	when DONE =>
-	  		next_state <= START;
-          end case;
-  end process;
+	when ADDRESS =>
+		if i_start = '1' then 
+			next_state <= ADDRESS;
+		else
+			next_state <= END_ADDRESS;
+		end if;
+	when END_ADDRESS =>
+		next_state <= REG;
+	when REG =>
+		next_state <= DONE;
+	when DONE =>
+		next_state <= START;
+  end case;
+end process;
 
 --Gestione segnali
 process	(cur_state, o_regAddr, o_regCh) 
