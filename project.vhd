@@ -228,16 +228,18 @@ begin
 	process(i_clk, i_rst) --default
 	begin
 		if(i_rst = '1') then
-			cur_state <= START;
+			cur_state <= RESET;
 		elsif i_clk'event and i_clk = '1' then
 			cur_state <= next_state;
 		end if;
 	end process;
 		 
-	process(cur_state, i_start, i_rst) 
+	process(cur_state, i_start) 
 	begin 
 	  next_state <= cur_state
 	  case cur_state is
+	  	when RESET =>
+	  		next_state <= START;
 	  	when START =>
 	  		if i_start = '1' then
 	  			next_state <= CH_1;	  			
@@ -292,6 +294,13 @@ begin
    o_z3 <= mux_regZ3;
 
   case cur_state is
+	when RESET =>
+	  	o_regCh <= "00";
+	  	o_regAddr <= "0000000000000000";
+	  	o_regZ0 <= "00000000";
+	  	o_regZ1 <= "00000000";
+	  	o_regZ2 <= "00000000";
+	  	o_regZ3 <= "00000000";
 	when START => 
 	when CH_1 =>
 		rCh_load <= '1';
