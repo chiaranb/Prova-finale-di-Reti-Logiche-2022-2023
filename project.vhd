@@ -126,7 +126,7 @@ begin
 	 	if(i_rst = '1') then
 			o_regCh <= "00";
 		elsif i_clk'event and i_clk = '1' then
-			o_regCh(2 downto 1) <= o_regCh(1 downto 0);
+			o_regCh(1) <= o_regCh(0);
 			o_regCh(0) <= i_w;
 		end if;
 	end process;
@@ -334,6 +334,7 @@ begin
 				rZ2_load <= '1';
 			when "11" => 
 				rZ3_load <= '1';
+			when others =>
 		end case;
 	when DONE =>
 		o_done <= '1';
