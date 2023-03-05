@@ -7,7 +7,6 @@
 -- Project Name: CodicePersona.vhd
 ----------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -194,9 +193,9 @@ begin
                     
 --Mux Address
 	with rAddr_sel select
-		mux_regAddr <=  "0" when '0',
+		mux_regAddr <=  '0' when '0',
 				i_w when '1',
-				"X" when others;
+				'X' when others;
 
  --Mux Z0
 	with rz0_sel select
