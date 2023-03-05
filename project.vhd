@@ -222,15 +222,10 @@ begin
 			     "XXXXXXXX" when others;
 
 --Demux
-	with demux_sel select 
-		demux_regZ0 <=  o_regIN when "00",
-			        "XXXXXXXXX" when others; 
-		demux_regZ1 <=  o_regIN when "01" ,
-				"XXXXXXXXX" when others;
-		demux_regZ2 <= 	o_regIN when "10",
-				"XXXXXXXXX" when others;    
-		demux_regZ3 <= 	o_regIN when "11",
-				"XXXXXXXXX" when others;
+	demux_regZ0 <=  o_regIN when demux_sel = "00" else (others => '-');
+        demux_regZ1 <=  o_regIN when demux_sel = "01" else (others => '-');
+	demux_regZ2 <=  o_regIN when demux_sel = "10" else (others => '-');
+	demux_regZ3 <=  o_regIN when demux_sel = "11" else (others => '-');
           
 --
 ---- FSM
@@ -299,7 +294,7 @@ begin
    rZ2_sel <= '0';
    rZ3_sel <= '0';
    o_done <= '0';
-   --o_mem_addr <= "0000000000000000";
+   o_mem_addr <= "0000000000000000";
    o_mem_en <= '0';
    o_mem_we <= '0';
    o_z0 <= mux_regZ0;
