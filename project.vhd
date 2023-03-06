@@ -47,10 +47,15 @@ architecture Behavioral of project_reti_logiche is
            rCh_load : in STD_LOGIC;
            rAddr_load : in STD_LOGIC;
 	       rIN_load : in STD_LOGIC;
+	       rZ0_load : in STD_LOGIC;
+	       rZ1_load : in STD_LOGIC;
+	       rZ2_load : in STD_LOGIC;
+	       rZ3_load : in STD_LOGIC;
            rZ0_sel : in STD_LOGIC;
            rZ1_sel : in STD_LOGIC;
            rZ2_sel : in STD_LOGIC;
            rZ3_sel : in STD_LOGIC;
+           rCh_sel : in STD_LOGIC;
            demux_sel : in STD_LOGIC_VECTOR (1 downto 0));         
 end component; 
 
@@ -64,7 +69,19 @@ end component;
 
       signal o_regIN : STD_LOGIC_VECTOR (7 downto 0);
       signal rIN_load : STD_LOGIC;
-          
+
+      signal o_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ0_load : STD_LOGIC;
+      
+      signal o_regZ1: STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ1_load : STD_LOGIC;
+      
+      signal o_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ2_load : STD_LOGIC;
+      
+      signal o_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
+      signal rZ3_load : STD_LOGIC;
+      
 --Mux
       --signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ0_sel : STD_LOGIC;
@@ -76,7 +93,9 @@ end component;
       signal rZ2_sel : STD_LOGIC;
 
       --signal mux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
-      signal rZ3_sel : STD_LOGIC;
+      signal rZ3_sel : STD_LOGIC;   
+      
+      signal rAddr_sel : STD_LOGIC;  
           
 --Demultiplexer
       signal demux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
@@ -85,7 +104,7 @@ end component;
       signal demux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
       signal demux_sel : STD_LOGIC_VECTOR (1 downto 0);
 
-type Stato is (IDLE, CH_1, CH_0, ADDRESS, END_ADDRESS, WRITE, DONE, RESET);
+type Stato is (IDLE, CH_1, ADDRESS, END_ADDRESS, WRITE, CH, LOAD, DONE, RESET);
 signal cur_state, next_state : Stato;
 
 begin
@@ -93,26 +112,7 @@ begin
 --
 ----DATAPATH 
 --
-	DATAPATH0: datapath port map(
-	       i_clk => i_clk,
-           i_rst =>  i_rst,
-           i_w  => i_w,
-           i_mem_data =>  i_mem_data,
-           o_z0  => o_z0,
-           o_z1 => o_z1,
-           o_z2  => o_z2,
-           o_z3  => o_z3,
-           o_mem_addr  => o_mem_addr,
-            
-           rCh_load  => rCh_load,
-           rAddr_load => rAddr_load,
-	       rIN_load => rIN_load,
-           rZ0_sel=> rZ0_sel,
-           rZ1_sel => rZ1_sel,
-           rZ2_sel =>rZ2_sel,
-           rZ3_sel => rZ3_sel,
-           demux_sel => demux_sel
-           );
+
              
 --Registro Address
     process(i_clk, i_rst)
@@ -154,29 +154,80 @@ begin
 		end if;
 	end process;                   
 
+--Registro Z0
+	process(i_clk, i_rst)
+	   begin
+		if(i_rst = '1') then
+			o_regZ0 <= "00000000";
+		elsif i_clk'event and i_clk = '1' then
+			if(rZ0_load = '1') then
+				o_regZ0 <= demux_regZ0;
+			end if;
+		end if;
+	end process;
+	
+--Registro Z1
+	process(i_clk, i_rst)
+	   begin
+		if(i_rst = '1') then
+			o_regZ1 <= "00000000";
+		elsif i_clk'event and i_clk = '1' then
+			if(rZ1_load = '1') then
+				o_regZ1 <= demux_regZ1;
+			end if;
+		end if;
+	end process;
+
+--Registro Z2
+	process(i_clk, i_rst)
+	   begin
+		if(i_rst = '1') then
+			o_regZ2 <= "00000000";
+		elsif i_clk'event and i_clk = '1' then
+			if(rZ2_load = '1') then
+				o_regZ2 <= demux_regZ2;
+			end if;
+		end if;
+	end process;
+	
+--Registro Z3
+	process(i_clk, i_rst)
+	   begin
+		if(i_rst = '1') then
+			o_regZ3 <= "00000000";
+		elsif i_clk'event and i_clk = '1' then
+			if(rZ3_load = '1') then
+				o_regZ3 <= demux_regZ3;
+			end if;
+		end if;
+	end process;
+
  --Mux Z0
 	with rz0_sel select
 		o_z0 <=  "00000000" when '0',
-			      demux_regZ0 when '1',
+			      o_regZ0 when '1',
 		 	      "XXXXXXXX" when others;
 
   --Mux Z1
 	with rz1_sel select
 		o_z1 <= "00000000" when '0',
-			     demux_regZ1 when '1',
+			     o_regZ1 when '1',
 			     "XXXXXXXX" when others;
 
 --Mux Z2
 	with rz2_sel select
 		o_z2 <= "00000000" when '0',
-			     demux_regZ2 when '1',
+			     o_regZ2 when '1',
 			     "XXXXXXXX" when others;
 
 --Mux Z3
 	with rz3_sel select
 		o_z3 <= "00000000" when '0',
-			      demux_regZ3 when '1',
+			      o_regZ3 when '1',
 			     "XXXXXXXX" when others;
+
+--Mux Addr
+    
 
 --Demux
 		demux_regZ0 <=  o_regIN when demux_sel = "00" else (others => '0');
@@ -209,20 +260,22 @@ begin
 		end if;
 	when IDLE =>
 		if i_start = '1' then
-			next_state <= CH_1;	  			
+			next_state <= CH_1;	
 		else
 			next_state <= IDLE;
 		end if;	
 	when CH_1 =>
 		if i_start = '1' then
-			next_state <= CH_0;
-		end if;
-	when CH_0 => 
-		if i_start = '1' then
-			next_state <= ADDRESS;		
+			next_state <= ADDRESS;
 		else
-			next_state <= END_ADDRESS;
+		  next_state <= END_ADDRESS;
 		end if;
+--	when CH_0 => 
+--		if i_start = '1' then
+--			next_state <= ADDRESS;		
+--		else
+--			next_state <= END_ADDRESS;
+--		end if;
 	when ADDRESS =>
 		if i_start = '1' then 
 			next_state <= ADDRESS;
@@ -232,7 +285,11 @@ begin
 	when END_ADDRESS =>
 		next_state <= WRITE;
 	when WRITE =>
-		next_state <= DONE;
+		next_state <= CH;
+    when CH =>
+        next_state <= LOAD;
+    when LOAD =>
+        next_state <= DONE;
 	when DONE =>
 	    if i_start = '0' then
 		next_state <= IDLE;
@@ -241,11 +298,15 @@ begin
 end process;
 
 --Gestione segnali
-process	(cur_state, o_regAddr) 
+process	(cur_state, i_start) 
 begin
    rCh_load <= '0';
    rAddr_load <= '0';
    rIN_load <= '0';
+   rZ0_load <= '0';
+   rZ1_load <= '0';
+   rZ2_load <= '0';
+   rZ3_load <= '0';
    rZ0_sel <= '0';
    rZ1_sel <= '0';
    rZ2_sel <= '0';
@@ -258,20 +319,41 @@ begin
   case cur_state is
 	when RESET =>
 	when IDLE => 
+	   if i_start = '1' then
+	       rCh_load <= '1';
+      end if;
 	when CH_1 =>
 	   rCh_load <= '1';
-	when CH_0 =>
-        rCh_load <= '1';
+--	when CH_0 =>
+--        rCh_load <= '1';
 	when ADDRESS =>
+	   if i_start = '1' then
 		rAddr_load <= '1';
+		else
+		rAddr_load <= '0';
+		end if;
 	when END_ADDRESS =>
 		o_mem_addr <= o_regAddr;
 		o_mem_en <= '1';
 		o_mem_we <= '0';
 	when WRITE =>
         rIN_load <= '1'; 
-	when DONE =>
+	when CH =>
 		demux_sel <= o_regCh;
+     when LOAD =>
+        demux_sel <= o_regCh;
+     	case demux_sel is
+		  when "00" =>
+		      rZ0_load <= '1';
+          when "01" =>
+              rZ1_load <= '1';
+          when "10" =>
+              rZ2_load <= '1';
+          when "11" =>
+              rZ3_load <= '1';
+          when others =>
+        end case;
+     when DONE =>
 		o_done <= '1';
 		rZ0_sel <= '1';
 		rZ1_sel <= '1';
