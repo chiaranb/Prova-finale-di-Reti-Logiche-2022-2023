@@ -66,6 +66,7 @@ end component;
         
       signal o_regAddr : STD_LOGIC_VECTOR (15 downto 0);
       signal rAddr_load : STD_LOGIC;
+      signal clear : STD_LOGIC;
 
       signal o_regIN : STD_LOGIC_VECTOR (7 downto 0);
       signal rIN_load : STD_LOGIC;
@@ -85,7 +86,7 @@ end component;
 --Mux
       --signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ0_sel : STD_LOGIC;
-
+      
       --signal mux_regZ1 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ1_sel : STD_LOGIC;
 
@@ -115,10 +116,12 @@ begin
 
              
 --Registro Address
-    process(i_clk, i_rst)
+    process(i_clk, i_rst, clear)
 	  begin
 	 	if(i_rst = '1') then
 			o_regAddr <= "0000000000000000";
+		elsif(clear = '1') then
+		  o_regAddr <= "0000000000000000";
 	 	elsif i_clk'event and i_clk = '1' then
 	 	   if(rAddr_load = '1') then
                 o_regAddr(15 downto 1) <= o_regAddr(14 downto 0);
@@ -315,6 +318,7 @@ begin
    o_mem_en <= '0';
    o_mem_we <= '0';
    demux_sel <= "00";
+   clear <= '0';
    
   case cur_state is
 	when RESET =>
@@ -354,6 +358,7 @@ begin
           when others =>
         end case;
      when DONE =>
+        clear <= '1';
 		o_done <= '1';
 		rZ0_sel <= '1';
 		rZ1_sel <= '1';
