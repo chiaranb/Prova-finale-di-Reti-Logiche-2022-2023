@@ -1,10 +1,10 @@
 ----------------------------------------------------------------------------------
 -- Prova Finale (Progetto di Reti Logiche) AA 2022-2023
--- Chiara Thien Thao Nguyen Ba CodicePersona 10727985
--- Flavia Nicotri CodicePersona 10751801
+-- Chiara Thien Thao Nguyen Ba - CodicePersona 10727985
+-- Flavia Nicotri - CodicePersona 10751801
 -- Prof. Fabio Salice
 -- Module Name: project_reti_logiche - Behavioral
--- Project Name: CodicePersona.vhd
+-- Project Name: 10727985_10751801.vhd
 ----------------------------------------------------------------------------------
 
 
@@ -51,14 +51,13 @@ architecture Behavioral of project_reti_logiche is
 	       rZ1_load : in STD_LOGIC;
 	       rZ2_load : in STD_LOGIC;
 	       rZ3_load : in STD_LOGIC;
+	       clear_addr : in STD_LOGIC;
            rZ0_sel : in STD_LOGIC;
            rZ1_sel : in STD_LOGIC;
            rZ2_sel : in STD_LOGIC;
            rZ3_sel : in STD_LOGIC;
-           rCh_sel : in STD_LOGIC;
            demux_sel : in STD_LOGIC_VECTOR (1 downto 0));         
 end component; 
-
                     
 --Registri
       signal o_regCh : STD_LOGIC_VECTOR(1 downto 0);
@@ -66,7 +65,7 @@ end component;
         
       signal o_regAddr : STD_LOGIC_VECTOR (15 downto 0);
       signal rAddr_load : STD_LOGIC;
-      signal clear : STD_LOGIC;
+      signal clear_addr : STD_LOGIC;
 
       signal o_regIN : STD_LOGIC_VECTOR (7 downto 0);
       signal rIN_load : STD_LOGIC;
@@ -84,15 +83,10 @@ end component;
       signal rZ3_load : STD_LOGIC;
       
 --Mux
-      signal rZ0_sel : STD_LOGIC;
-      
+      signal rZ0_sel : STD_LOGIC;   
       signal rZ1_sel : STD_LOGIC;
-
       signal rZ2_sel : STD_LOGIC;
-
       signal rZ3_sel : STD_LOGIC;   
-      
-      signal rAddr_sel : STD_LOGIC;  
           
 --Demultiplexer
       signal demux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
@@ -101,22 +95,19 @@ end component;
       signal demux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
       signal demux_sel : STD_LOGIC_VECTOR (1 downto 0);
 
-type Stato is (IDLE, CH_1, ADDRESS, END_ADDRESS, WRITE, CH, LOAD, DONE, RESET);
+type Stato is (IDLE, CH, READ, ADDR, MEM, LOAD, DONE);
 signal cur_state, next_state : Stato;
-
 begin
-  
 --
 ----DATAPATH 
 --
-
              
 --Registro Address
-    process(i_clk, i_rst, clear)
+    process(i_clk, i_rst, clear_addr)
 	  begin
 	 	if(i_rst = '1') then
 			o_regAddr <= "0000000000000000";
-		elsif(clear = '1') then
+		elsif(clear_addr = '1') then
 		  o_regAddr <= "0000000000000000";
 	 	elsif i_clk'event and i_clk = '1' then
 	 	   if(rAddr_load = '1') then
@@ -129,7 +120,7 @@ begin
     o_mem_addr <= o_regAddr;
    
                 
-------Registro Canale
+--Registro Canale
     process(i_clk, i_rst)
     begin
         if(i_rst = '1') then
@@ -241,7 +232,7 @@ begin
 process(i_clk, i_rst) 
 begin
 	if(i_rst = '1') then
-		cur_state <= RESET;
+		cur_state <= IDLE;
 	elsif i_clk'event and i_clk = '1' then	 	   
 		cur_state <= next_state;
 	end if;
@@ -252,42 +243,32 @@ process(cur_state, i_start)
 begin 
   next_state <= cur_state;
   case cur_state is
-	when RESET =>
-	   if i_start = '0' then
-		next_state <= IDLE;
-		else
-		next_state <= CH_1;
-		end if;
 	when IDLE =>
 		if i_start = '1' then
-			next_state <= CH_1;	
+			next_state <= CH;	
 		else
 			next_state <= IDLE;
 		end if;	
-	when CH_1 =>
+	when CH =>
 		if i_start = '1' then
-			next_state <= ADDRESS;
+			next_state <= READ;
 		else
-		  next_state <= END_ADDRESS;
+		  next_state <= ADDR;
 		end if;
-	when ADDRESS =>
+	when READ =>
 		if i_start = '1' then 
-			next_state <= ADDRESS;
+			next_state <= READ;
 		else
-			next_state <= END_ADDRESS;
+			next_state <= ADDR;
 		end if;
-	when END_ADDRESS =>
-		next_state <= WRITE;
-	when WRITE =>
-		next_state <= CH;
-    when CH =>
-        next_state <= LOAD;
+	when ADDR =>
+		next_state <= MEM;
+	when MEM =>
+		next_state <= LOAD;
     when LOAD =>
         next_state <= DONE;
 	when DONE =>
-	    if i_start = '0' then
 		next_state <= IDLE;
-		end if;
   end case;
 end process;
 
@@ -309,32 +290,24 @@ begin
    o_mem_en <= '0';
    o_mem_we <= '0';
    demux_sel <= "00";
-   clear <= '0';
+   clear_addr <= '0';
    
   case cur_state is
-	when RESET =>
-	   if i_start = '1' then
-           rCh_load <= '1';
-        end if;
 	when IDLE => 
 	   if i_start = '1' then
 	       rCh_load <= '1';
       end if;
-	when CH_1 =>
+	when CH =>
 	   rCh_load <= '1';
-	when ADDRESS =>
+	when READ =>
 	   if i_start = '1' then
 		rAddr_load <= '1';
-		else
-		rAddr_load <= '0';
 		end if;
-	when END_ADDRESS =>
+	when ADDR =>
 		o_mem_en <= '1';
 		o_mem_we <= '0';
-	when WRITE =>
+	when MEM =>
         rIN_load <= '1'; 
-	when CH =>
-		demux_sel <= o_regCh;
      when LOAD =>
         demux_sel <= o_regCh;
      	case demux_sel is
@@ -349,13 +322,12 @@ begin
           when others =>
         end case;
      when DONE =>
-        clear <= '1';
+        clear_addr <= '1';
 		o_done <= '1';
 		rZ0_sel <= '1';
 		rZ1_sel <= '1';
 		rZ2_sel <= '1';
 		rZ3_sel <= '1';
-
   end case;
 end process; 
 end Behavioral;
