@@ -84,16 +84,12 @@ end component;
       signal rZ3_load : STD_LOGIC;
       
 --Mux
-      --signal mux_regZ0 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ0_sel : STD_LOGIC;
       
-      --signal mux_regZ1 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ1_sel : STD_LOGIC;
 
-      --signal mux_regZ2 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ2_sel : STD_LOGIC;
 
-      --signal mux_regZ3 : STD_LOGIC_VECTOR (7 downto 0);
       signal rZ3_sel : STD_LOGIC;   
       
       signal rAddr_sel : STD_LOGIC;  
@@ -129,7 +125,9 @@ begin
 			end if;
 		end if;
 	end process;
-    
+ 
+    o_mem_addr <= o_regAddr;
+   
                 
 ------Registro Canale
     process(i_clk, i_rst)
@@ -227,10 +225,7 @@ begin
 	with rz3_sel select
 		o_z3 <= "00000000" when '0',
 			      o_regZ3 when '1',
-			     "XXXXXXXX" when others;
-
---Mux Addr
-    
+			     "XXXXXXXX" when others;    
 
 --Demux
 		demux_regZ0 <=  o_regIN when demux_sel = "00" else (others => '0');
@@ -260,6 +255,8 @@ begin
 	when RESET =>
 	   if i_start = '0' then
 		next_state <= IDLE;
+		else
+		next_state <= CH_1;
 		end if;
 	when IDLE =>
 		if i_start = '1' then
@@ -273,12 +270,6 @@ begin
 		else
 		  next_state <= END_ADDRESS;
 		end if;
---	when CH_0 => 
---		if i_start = '1' then
---			next_state <= ADDRESS;		
---		else
---			next_state <= END_ADDRESS;
---		end if;
 	when ADDRESS =>
 		if i_start = '1' then 
 			next_state <= ADDRESS;
@@ -301,7 +292,7 @@ begin
 end process;
 
 --Gestione segnali
-process	(cur_state, i_start) 
+process	(cur_state, i_start, o_regCh, demux_sel) 
 begin
    rCh_load <= '0';
    rAddr_load <= '0';
@@ -322,14 +313,15 @@ begin
    
   case cur_state is
 	when RESET =>
+	   if i_start = '1' then
+           rCh_load <= '1';
+        end if;
 	when IDLE => 
 	   if i_start = '1' then
 	       rCh_load <= '1';
       end if;
 	when CH_1 =>
 	   rCh_load <= '1';
---	when CH_0 =>
---        rCh_load <= '1';
 	when ADDRESS =>
 	   if i_start = '1' then
 		rAddr_load <= '1';
@@ -337,7 +329,6 @@ begin
 		rAddr_load <= '0';
 		end if;
 	when END_ADDRESS =>
-		o_mem_addr <= o_regAddr;
 		o_mem_en <= '1';
 		o_mem_we <= '0';
 	when WRITE =>
