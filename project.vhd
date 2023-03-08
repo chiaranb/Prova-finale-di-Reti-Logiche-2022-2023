@@ -46,12 +46,12 @@ architecture Behavioral of project_reti_logiche is
             
            rCh_load : in STD_LOGIC;
            rAddr_load : in STD_LOGIC;
-	       rIN_load : in STD_LOGIC;
-	       rZ0_load : in STD_LOGIC;
-	       rZ1_load : in STD_LOGIC;
-	       rZ2_load : in STD_LOGIC;
-	       rZ3_load : in STD_LOGIC;
-	       clear_addr : in STD_LOGIC;
+       	   rIN_load : in STD_LOGIC;
+           rZ0_load : in STD_LOGIC;
+           rZ1_load : in STD_LOGIC;
+           rZ2_load : in STD_LOGIC;
+           rZ3_load : in STD_LOGIC;
+           clear_addr : in STD_LOGIC;
            rZ0_sel : in STD_LOGIC;
            rZ1_sel : in STD_LOGIC;
            rZ2_sel : in STD_LOGIC;
@@ -104,18 +104,18 @@ begin
              
 --Registro Address
     process(i_clk, i_rst, clear_addr)
-	  begin
-	 	if(i_rst = '1') then
-			o_regAddr <= "0000000000000000";
-		elsif(clear_addr = '1') then
-		  o_regAddr <= "0000000000000000";
-	 	elsif i_clk'event and i_clk = '1' then
-	 	   if(rAddr_load = '1') then
-                o_regAddr(15 downto 1) <= o_regAddr(14 downto 0);
-                o_regAddr(0) <= i_w;
-			end if;
+    begin
+	if(i_rst = '1') then
+		o_regAddr <= "0000000000000000";
+	elsif(clear_addr = '1') then
+		o_regAddr <= "0000000000000000";
+	elsif i_clk'event and i_clk = '1' then
+		if(rAddr_load = '1') then
+		  	o_regAddr(15 downto 1) <= o_regAddr(14 downto 0);
+			o_regAddr(0) <= i_w;
 		end if;
-	end process;
+	end if;
+    end process;
  
     o_mem_addr <= o_regAddr;
    
@@ -124,31 +124,31 @@ begin
     process(i_clk, i_rst)
     begin
         if(i_rst = '1') then
-            o_regCh <= "00";
+           	o_regCh <= "00";
         elsif i_clk'event and i_clk = '1' then
-            if(rCh_load = '1') then
-                o_regCh(1) <= o_regCh(0);
-                o_regCh(0) <= i_w;
-            end if;
+	       if(rCh_load = '1') then
+		        o_regCh(1) <= o_regCh(0);
+		        o_regCh(0) <= i_w;
+	    end if;
         end if;
     end process;
 
 
 --Registro Dato IN
 	process(i_clk, i_rst)
-	    begin
+    begin
 		if(i_rst = '1') then
 		   	o_regIN <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
 		    if(rIN_load = '1') then
-			 o_regIN <= i_mem_data;
+			    o_regIN <= i_mem_data;
 		    end if;
 		end if;
 	end process;                   
 
 --Registro Z0
 	process(i_clk, i_rst)
-	   begin
+	begin
 		if(i_rst = '1') then
 			o_regZ0 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
@@ -160,7 +160,7 @@ begin
 	
 --Registro Z1
 	process(i_clk, i_rst)
-	   begin
+	begin
 		if(i_rst = '1') then
 			o_regZ1 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
@@ -172,7 +172,7 @@ begin
 
 --Registro Z2
 	process(i_clk, i_rst)
-	   begin
+	begin
 		if(i_rst = '1') then
 			o_regZ2 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
@@ -184,7 +184,7 @@ begin
 	
 --Registro Z3
 	process(i_clk, i_rst)
-	   begin
+	begin
 		if(i_rst = '1') then
 			o_regZ3 <= "00000000";
 		elsif i_clk'event and i_clk = '1' then
@@ -196,27 +196,27 @@ begin
 
  --Mux Z0
 	with rz0_sel select
-		o_z0 <=  "00000000" when '0',
-			      o_regZ0 when '1',
-		 	      "XXXXXXXX" when others;
+		o_z0 <= "00000000" when '0',
+			    o_regZ0 when '1',
+		 	    "XXXXXXXX" when others;
 
   --Mux Z1
 	with rz1_sel select
 		o_z1 <= "00000000" when '0',
-			     o_regZ1 when '1',
-			     "XXXXXXXX" when others;
+			    o_regZ1 when '1',
+			    "XXXXXXXX" when others;
 
 --Mux Z2
 	with rz2_sel select
 		o_z2 <= "00000000" when '0',
-			     o_regZ2 when '1',
-			     "XXXXXXXX" when others;
+			    o_regZ2 when '1',
+			    "XXXXXXXX" when others;
 
 --Mux Z3
 	with rz3_sel select
 		o_z3 <= "00000000" when '0',
-			      o_regZ3 when '1',
-			     "XXXXXXXX" when others;    
+			    o_regZ3 when '1',
+			    "XXXXXXXX" when others;    
 
 --Demux
 		demux_regZ0 <=  o_regIN when demux_sel = "00" else (others => '0');
@@ -253,7 +253,7 @@ begin
 		if i_start = '1' then
 			next_state <= READ;
 		else
-		  next_state <= ADDR;
+		    next_state <= ADDR;
 		end if;
 	when READ =>
 		if i_start = '1' then 
@@ -292,16 +292,16 @@ begin
    demux_sel <= "00";
    clear_addr <= '0';
    
-  case cur_state is
+    case cur_state is
 	when IDLE => 
-	   if i_start = '1' then
+	    if i_start = '1' then
 	       rCh_load <= '1';
-      end if;
+        end if;
 	when CH =>
-	   rCh_load <= '1';
+	    rCh_load <= '1';
 	when READ =>
-	   if i_start = '1' then
-		rAddr_load <= '1';
+	    if i_start = '1' then
+		    rAddr_load <= '1';
 		end if;
 	when ADDR =>
 		o_mem_en <= '1';
@@ -311,23 +311,23 @@ begin
      when LOAD =>
         demux_sel <= o_regCh;
      	case demux_sel is
-		  when "00" =>
-		      rZ0_load <= '1';
-          when "01" =>
-              rZ1_load <= '1';
-          when "10" =>
-              rZ2_load <= '1';
-          when "11" =>
-              rZ3_load <= '1';
-          when others =>
+		    when "00" =>
+		        rZ0_load <= '1';
+            when "01" =>
+                rZ1_load <= '1';
+            when "10" =>
+                rZ2_load <= '1';
+            when "11" =>
+                rZ3_load <= '1';
+            when others =>
         end case;
-     when DONE =>
+    when DONE =>
         clear_addr <= '1';
 		o_done <= '1';
 		rZ0_sel <= '1';
 		rZ1_sel <= '1';
 		rZ2_sel <= '1';
 		rZ3_sel <= '1';
-  end case;
+    end case;
 end process; 
 end Behavioral;
