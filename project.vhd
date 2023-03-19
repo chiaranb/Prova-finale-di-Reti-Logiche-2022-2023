@@ -117,6 +117,7 @@ BEGIN
     END PROCESS;
 
     o_mem_addr <= o_regAddr;
+
     --Registro Canale
     PROCESS (i_clk, i_rst)
     BEGIN
@@ -129,6 +130,7 @@ BEGIN
             END IF;
         END IF;
     END PROCESS;
+
     --Registro Dato IN
     PROCESS (i_clk, i_rst)
     BEGIN
@@ -293,6 +295,7 @@ BEGIN
 
         CASE cur_state IS
             WHEN IDLE =>
+                clear_addr <= '1';
                 IF i_start = '1' THEN
                     rCh_load <= '1';
                 END IF;
@@ -321,7 +324,6 @@ BEGIN
                     WHEN OTHERS =>
                 END CASE;
             WHEN DONE =>
-                clear_addr <= '1';
                 o_done <= '1';
                 rZ0_sel <= '1';
                 rZ1_sel <= '1';
