@@ -1,10 +1,9 @@
 ----------------------------------------------------------------------------------
 -- Prova Finale (Progetto di Reti Logiche) AA 2022-2023
--- Chiara Thien Thao Nguyen Ba - CodicePersona 10727985
--- Flavia Nicotri - CodicePersona 10751801
+-- Chiara Thien Thao Nguyen Ba 
+-- Flavia Nicotri
 -- Prof. Fabio Salice
 -- Module Name: project_reti_logiche - Behavioral
--- Project Name: 10727985_10751801.vhd
 ----------------------------------------------------------------------------------
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
